@@ -1,15 +1,33 @@
+//
+//  SocketTest.swift
+//  Socket
+//
+//  Created by Bastien LE CORRE on 2021-01-07.
+//
+
 import XCTest
-@testable import Socket
+import Socket
 
-final class SocketTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(Socket().text, "Hello, World!")
-    }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
+class SocketTests : XCTestCase {
+	
+	var socket : Socket? = nil
+	
+	override func setUpWithError() throws {
+		socket = try Socket(
+			host: "eu-cdbr-west-03.cleardb.net",
+			port: 3306,
+			addressFamily: AF_INET,
+			socketType: SOCK_STREAM,
+			socketProtocol: 0
+		)
+		try socket!.connect()
+	}
+	
+	override func tearDownWithError() throws {
+		try socket!.close()
+	}
+	
+	func testRead() throws {
+		return
+	}
 }
