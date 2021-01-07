@@ -2,21 +2,23 @@ import Foundation
 
 public class Socket {
 	let socket : Int32
-	let addressFamily : Int32
-	let socketType : Int32
-	let socketProtocol : Int32
+	let host : String?
 	
-	var port : UInt16
-	var infos : addrinfo = addrinfo()
+	public let addressFamily : Int32
+	public let socketType : Int32
+	public let socketProtocol : Int32
+	
+	public var port : UInt16
 	
 	var maxConnections : Int32 = 1
 	
-	public init(host : String, port : UInt16, addressFamily : Int32, socketType : Int32, socketProtocol : Int32, maxConnections : Int32 = 1) throws {
-		// Create socket
+	public init(host : String?, port : UInt16, addressFamily : Int32, socketType : Int32, socketProtocol : Int32, maxConnections : Int32 = 1) throws {
+		self.host = host
 		self.addressFamily = addressFamily
 		self.socketType = socketType
 		self.socketProtocol = socketProtocol
 		
+		// Create socket
 		socket = Darwin.socket(addressFamily, socketType, socketProtocol)
 		guard self.socket != -1 else {
 			throw SocketError.socketCreationFailed(String(cString: strerror(errno)))
@@ -25,27 +27,27 @@ public class Socket {
 		// Initialize parameters
 		self.port = port
 		self.maxConnections = maxConnections
-		
-		// Socket infos
-		self.infos = try getAddrInfo(host)
-		
-		// MARK: SQL server only!
-		// Set socket options
-		var value : Int32 = 1;
-		try setOption(level: SOL_SOCKET, option: SO_REUSEADDR, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
-		try setOption(level: SOL_SOCKET, option: SO_KEEPALIVE, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
-		try setOption(level: SOL_SOCKET, option: SO_NOSIGPIPE, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
 	}
 	
 	/// Connect client socket to server.
-	public func connect() throws {
+	public func connect(infos : addrinfo) throws {
 		guard Darwin.connect(socket, infos.ai_addr, socklen_t(infos.ai_addrlen)) != -1 else {
 			throw SocketError.connectFailed(String(cString: strerror(errno)))
 		}
 	}
 	
+	public func connectAll(infos : [addrinfo]) throws {
+		for info in infos {
+			do {
+				try connect(infos: info)
+				return
+			}
+			catch {}
+		}
+	}
+	
 	/// Bind server to an address.
-	public func bind() throws {
+	public func bind(infos : addrinfo) throws {
 		guard Darwin.bind(socket, infos.ai_addr, socklen_t(infos.ai_addrlen)) != -1 else {
 			throw SocketError.bindFailed(String(cString: strerror(errno)))
 		}
@@ -82,27 +84,32 @@ public class Socket {
 		}
 	}
 	
-	// -- Utility --
 	/// Get server address infos from host for socket connection.
-	private func getAddrInfo(_ host : String) throws -> addrinfo {
+	public func getAddressInfos() throws -> [addrinfo] {
+		var result : [addrinfo] = []
 		var hints : addrinfo = addrinfo(
-			ai_flags: AI_ALL,
+			ai_flags: AI_ADDRCONFIG,
 			ai_family: addressFamily,
 			ai_socktype: socketType,
-			ai_protocol: 0,
+			ai_protocol: socketProtocol,
 			ai_addrlen: 0,
 			ai_canonname: nil,
 			ai_addr: nil,
 			ai_next: nil
 		)
-		var serverInfos : UnsafeMutablePointer<addrinfo>? = nil
+		var infos : UnsafeMutablePointer<addrinfo>? = nil
 		
 		// Get infos
-		if (getaddrinfo(nil, String(port), &hints, &serverInfos) != 0) {
+		if (getaddrinfo(host, String(port), &hints, &infos) != 0) {
 			throw SocketError.getAddressInfoFailed(errno)
 		}
 		
-		return serverInfos!.pointee
+		while (infos != nil) {
+			result.append(infos!.pointee)
+			infos = infos!.pointee.ai_next
+		}
+		
+		return result
 	}
 }
 

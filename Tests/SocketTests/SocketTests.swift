@@ -14,13 +14,21 @@ class SocketTests : XCTestCase {
 	
 	override func setUpWithError() throws {
 		socket = try Socket(
-			host: "eu-cdbr-west-03.cleardb.net",
-			port: 3306,
+			host: "echo.websocket.org",
+			port: 80,
 			addressFamily: AF_INET,
 			socketType: SOCK_STREAM,
 			socketProtocol: 0
 		)
-		try socket!.connect()
+		
+		// Set socket options
+		var value : Int32 = 1;
+		try socket!.setOption(level: SOL_SOCKET, option: SO_REUSEADDR, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
+		try socket!.setOption(level: SOL_SOCKET, option: SO_KEEPALIVE, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
+		try socket!.setOption(level: SOL_SOCKET, option: SO_NOSIGPIPE, value: &value, length: socklen_t(MemoryLayout<Int32>.size))
+		
+		// Try all connections
+		try socket!.connectAll(infos: try socket!.getAddressInfos())
 	}
 	
 	override func tearDownWithError() throws {
