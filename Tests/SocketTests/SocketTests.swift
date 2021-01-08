@@ -43,6 +43,6 @@ class SocketTests : XCTestCase {
 	}
 	
 	func testSend() throws {
-		try socket!.sendPacket(data: [0, 1, 2, 4, 5])
+		try socket!.sendPacket(header: [UInt8(5), 0], data: [0, 1, 2, 4, 5])
 	}
 }
