@@ -36,10 +36,10 @@ class SocketTests : XCTestCase {
 	}
 	
 	func testRecv() throws {
-		let (packet, data) : (UInt8, [UInt8]) = try socket!.recvPacket(headerLength: 3)
+		let packet : Packet = try socket!.recvPacket(headerLength: 3)
 		
-		print("Received packet : #\(packet)")
-		print(data)
+		print("Received packet : #\(packet.id)")
+		print(packet.data)
 	}
 	
 	func testSend() throws {

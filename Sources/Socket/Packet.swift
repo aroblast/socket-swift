@@ -1,5 +1,10 @@
 import Foundation
 
+public struct Packet {
+	public let id : UInt8
+	public let data : [UInt8]
+}
+
 extension Socket {
 	
 	/// Receive UInt8 from socket.
@@ -31,11 +36,11 @@ extension Socket {
 	}
 	
 	/// Receive packet data for incoming message.
-	public func recvPacket(headerLength : Int32, flags : Int32 = 0) throws -> (UInt8, [UInt8]) {
+	public func recvPacket(headerLength : Int32, flags : Int32 = 0) throws -> Packet {
 		let (packet, length) : (UInt8, UInt16) = try recvHeader(length: headerLength)
 		let data : [UInt8] = try recvUInt8(length: Int32(length), flags: flags)
 		
-		return (packet, data)
+		return Packet(id: packet, data: data)
 	}
 	
 	/// Send header data for outgoing  message.
