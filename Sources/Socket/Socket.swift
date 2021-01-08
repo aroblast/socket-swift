@@ -11,6 +11,7 @@ public class Socket {
 	public var port : UInt16
 	
 	var maxConnections : Int32 = 1
+	var packet : UInt8 = 0
 	
 	public init(host : String?, port : UInt16, addressFamily : Int32, socketType : Int32, socketProtocol : Int32, maxConnections : Int32 = 1) throws {
 		self.host = host
@@ -31,6 +32,9 @@ public class Socket {
 	
 	/// Connect client socket to server.
 	public func connect(infos : addrinfo) throws {
+		// Reset TCP packet ordering
+		self.packet = 0
+		
 		guard Darwin.connect(socket, infos.ai_addr, socklen_t(infos.ai_addrlen)) != -1 else {
 			throw SocketError.connectFailed(String(cString: strerror(errno)))
 		}
@@ -55,6 +59,9 @@ public class Socket {
 	
 	/// Setup server socket to listen to incoming requests.
 	public func listen() throws {
+		// Reset TCP packet ordering
+		self.packet = 0
+		
 		guard Darwin.listen(socket, maxConnections) != -1 else {
 			throw SocketError.listenFailed(String(cString: strerror(errno)))
 		}
@@ -62,6 +69,9 @@ public class Socket {
 	
 	/// Disonnect socket.
 	public func close() throws {
+		// Reset TCP packet ordering
+		self.packet = 0
+		
 		guard Darwin.close(socket) == 0 else {
 			throw SocketError.socketShutdownFailed(String(cString: strerror(errno)))
 		}

@@ -40,6 +40,9 @@ extension Socket {
 		let (packet, length) : (UInt8, UInt16) = try recvHeader(length: headerLength)
 		let data : [UInt8] = try recvUInt8(length: Int32(length), flags: flags)
 		
+		// Save packet id to socket for TCP ordering
+		self.packet = packet
+		
 		return Packet(id: packet, data: data)
 	}
 	
