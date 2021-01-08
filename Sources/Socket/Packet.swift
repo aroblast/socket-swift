@@ -53,6 +53,8 @@ extension Socket {
 	/// Send packet data for outgoing message.
 	public func sendPacket(header : [UInt8], data : [UInt8], flags : Int32 = 0) throws {
 		try sendHeader(data: header)
-		_ = try send(data: data, flags: flags)
+		guard try send(data: data, flags: flags) == data.count else {
+			throw SocketError.sendFailed(String(cString: strerror(errno)))
+		}
 	}
 }
