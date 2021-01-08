@@ -9,9 +9,9 @@ public class Socket {
 	public let socketProtocol : Int32
 	
 	public var port : UInt16
+	public var packet : UInt8 = 0
 	
 	var maxConnections : Int32 = 1
-	var packet : UInt8 = 0
 	
 	public init(host : String?, port : UInt16, addressFamily : Int32, socketType : Int32, socketProtocol : Int32, maxConnections : Int32 = 1) throws {
 		self.host = host
