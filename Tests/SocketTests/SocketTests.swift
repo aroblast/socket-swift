@@ -14,8 +14,8 @@ class SocketTests : XCTestCase {
 	
 	override func setUpWithError() throws {
 		socket = try Socket(
-			host: "echo.websocket.org",
-			port: 80,
+			host: "eu-cdbr-west-03.cleardb.net",
+			port: 3306,
 			addressFamily: AF_INET,
 			socketType: SOCK_STREAM,
 			socketProtocol: 0
@@ -35,7 +35,14 @@ class SocketTests : XCTestCase {
 		try socket!.close()
 	}
 	
-	func testRead() throws {
-		return
+	func testRecv() throws {
+		let (packet, data) : (UInt8, [UInt8]) = try socket!.recvPacket(headerLength: 3)
+		
+		print("Received packet : #\(packet)")
+		print(data)
+	}
+	
+	func testSend() throws {
+		try socket!.sendPacket(data: [0, 1, 2, 4, 5])
 	}
 }

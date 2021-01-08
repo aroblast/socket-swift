@@ -84,6 +84,46 @@ public class Socket {
 		}
 	}
 	
+	/// Receive data from the connected socket.
+	public func recv(length : size_t, result : UnsafeMutableRawPointer, flags : Int32) throws -> Int {
+		let received : Int = Darwin.recv(socket, result, length, flags)
+		guard received > 0 else {
+			throw SocketError.recvFailed(String(cString: strerror(errno)))
+		}
+		
+		return received
+	}
+	
+	/// Read data from the connected socket.
+	public func read(length : size_t, result : UnsafeMutableRawPointer) throws -> Int {
+		let read : Int = Darwin.read(socket, result, length)
+		guard read > 0 else {
+			throw SocketError.recvFailed(String(cString: strerror(errno)))
+		}
+		
+		return read
+	}
+	
+	/// Send data to socket address.
+	public func send(data : [UInt8], flags : Int32) throws -> Int {
+		let sent : Int = Darwin.send(socket, data, size_t(data.count), flags)
+		guard sent > 0 else {
+			throw SocketError.sendFailed(String(cString: strerror(errno)))
+		}
+		
+		return sent
+	}
+	
+	/// Write data to socket address.
+	public func write(data : [UInt8]) throws -> Int {
+		let written : Int = Darwin.write(socket, data, size_t(data.count))
+		guard written > 0 else {
+			throw SocketError.writeFailed(String(cString: strerror(errno)))
+		}
+		
+		return written
+	}
+	
 	/// Get server address infos from host for socket connection.
 	public func getAddressInfos() throws -> [addrinfo] {
 		var result : [addrinfo] = []
@@ -123,6 +163,7 @@ extension Socket {
 		case connectFailed(String)
 		case bindFailed(String)
 		case listenFailed(String)
+		case sendFailed(String)
 		case writeFailed(String)
 		case getPeerNameFailed(String)
 		case convertingPeerNameFailed
