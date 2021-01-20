@@ -8,7 +8,7 @@ public struct Packet {
 extension Socket {
 	
 	/// Receive UInt8 from socket.
-	public func recvUInt8(length : Int32, flags : Int32) throws -> [UInt8] {
+	public func recvData(length : Int32, flags : Int32) throws -> [UInt8] {
 		var result : [UInt8] = [UInt8](repeating: 0, count: Int(length))
 		var received : Int = 0
 		var total : Int = 0
@@ -27,35 +27,8 @@ extension Socket {
 		return result
 	}
 	
-	/// Receive header data for incoming message.
-	public func recvHeader(length : Int32, flags : Int32 = 0) throws -> (UInt8, UInt16) {
-		let result : [UInt8] = try recvUInt8(length: length, flags: flags)
-		let packet : UInt8 = try recvUInt8(length: 1, flags: flags)[0]
-		
-		return (packet, result.withUnsafeBytes { $0.load(as: UInt16.self) })
-	}
-	
-	/// Receive packet data for incoming message.
-	public func recvPacket(headerLength : Int32, flags : Int32 = 0) throws -> Packet {
-		let (packet, length) : (UInt8, UInt16) = try recvHeader(length: headerLength)
-		let data : [UInt8] = try recvUInt8(length: Int32(length), flags: flags)
-		
-		// Save packet id to socket for TCP ordering
-		self.packet = packet
-		
-		return Packet(id: packet, data: data)
-	}
-	
-	/// Send header data for outgoing  message.
-	public func sendHeader(data : [UInt8], flags : Int32 = 0) throws {
-		guard try send(data: data, flags: flags) > 0 else {
-			throw SocketError.sendFailed(String(cString: strerror(errno)))
-		}
-	}
-	
 	/// Send packet data for outgoing message.
-	public func sendPacket(header : [UInt8], data : [UInt8], flags : Int32 = 0) throws {
-		try sendHeader(data: header)
+	public func sendData(data : [UInt8], flags : Int32 = 0) throws {
 		guard try send(data: data, flags: flags) == data.count else {
 			throw SocketError.sendFailed(String(cString: strerror(errno)))
 		}
