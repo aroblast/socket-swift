@@ -35,7 +35,7 @@ extension Socket {
 		
 		// Loop through all of grouped message bytes
 		while (total < Int(length)) {
-			read += try read(length: size_t(length), result: result.withUnsafeMutableBytes { $0.baseAddress! } + total)
+			read += try self.read(length: size_t(length), result: result.withUnsafeMutableBytes { $0.baseAddress! } + total)
 			total += read
 			
 			// Check for recv errors
