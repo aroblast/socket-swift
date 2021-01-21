@@ -1,10 +1,5 @@
 import Foundation
 
-public struct Packet {
-	public let id : UInt8
-	public let data : [UInt8]
-}
-
 extension Socket {
 	
 	/// Receive UInt8 from socket.
