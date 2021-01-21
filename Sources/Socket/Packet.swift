@@ -8,7 +8,7 @@ public struct Packet {
 extension Socket {
 	
 	/// Receive UInt8 from socket.
-	public func recvData(length : Int32, flags : Int32) throws -> [UInt8] {
+	public func recvData(length : UInt32, flags : Int32) throws -> [UInt8] {
 		var result : [UInt8] = [UInt8](repeating: 0, count: Int(length))
 		var received : Int = 0
 		var total : Int = 0
@@ -28,7 +28,7 @@ extension Socket {
 	}
 	
 	/// Read UInt8 from socket.
-	public func readData(length : Int32) throws -> [UInt8] {
+	public func readData(length : UInt32) throws -> [UInt8] {
 		var result : [UInt8] = [UInt8](repeating: 0, count: Int(length))
 		var read : Int = 0
 		var total : Int = 0
