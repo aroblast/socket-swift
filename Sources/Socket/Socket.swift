@@ -169,17 +169,16 @@ extension Socket {
 		case socketCreationFailed(String)
 		case socketShutdownFailed(String)
 		case getAddressInfoFailed(Int32)
-		case convertAddressFailed(String)
 		case connectFailed(String)
 		case bindFailed(String)
 		case listenFailed(String)
 		case sendFailed(String)
 		case writeFailed(String)
 		case getPeerNameFailed(String)
-		case convertingPeerNameFailed
 		case getNameInfoFailed(String)
 		case acceptFailed(String)
 		case recvFailed(String)
+		case readFailed(String)
 		case setSockOptFailed(String)
 		case getSockOptFailed(String)
 	}
