@@ -163,7 +163,7 @@ public class Socket {
 	}
 
 	// Signals
-	func on(event : Int32, handler : @convention(c) @escaping (Int32) -> Void) {
+	public func on(event : Int32, handler : @convention(c) @escaping (Int32) -> Void) {
 		signal(event, handler)
 	}
 }
