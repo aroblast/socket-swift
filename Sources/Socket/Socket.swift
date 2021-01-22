@@ -161,6 +161,11 @@ public class Socket {
 		
 		return result
 	}
+
+	// Signals
+	func on(event : Int32, handler : @convention(c) @escaping (Int32) -> Void) {
+		signal(event, handler)
+	}
 }
 
 // Enums

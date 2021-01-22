@@ -30,21 +30,4 @@ class SocketTests : XCTestCase {
 		// Try all connections
 		try socket!.connectAll(infos: try socket!.getAddressInfos())
 	}
-	
-	override func tearDownWithError() throws {
-		try socket!.close()
-	}
-	
-	func testRecv() throws {
-		for _ in 0..<1 {
-			let packet : Packet = try socket!.recvPacket(headerLength: 3)
-		 
-		 print("Received packet : #\(packet.id)")
-		 print(packet.data)
-		}
-	}
-	
-	func testSend() throws {
-		try socket!.sendPacket(header: [UInt8(5), 0], data: [0, 1, 2, 4, 5])
-	}
 }
